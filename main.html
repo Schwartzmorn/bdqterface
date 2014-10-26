@@ -1,34 +1,51 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Pouet</title>
+        <title>BDQTERFAAAAAAACE IN YOUR FAAAAACE</title>
+        <meta charset="UTF-8"> 
         <link rel="stylesheet" type="text/css" href="main.css" />
+        <script type="text/javascript" src="actors.js"></script>
         <script type="text/javascript" src="main.js"></script>
     </head>
     <body>
-        <span class="leftcont">
+        <div class="leftcont">
             <div class="history" id="historyCont">
-                gadabu
             </div>
             <div>
-                <input type="text" name="mainInput" class="maininput" />
+                <input type="text" class="maininput" id="mainInput" autocomplete="off" autofocus />
             </div>
-        </span>
-        <span class="rightcont" id="resultContainer">
-        </span>
+        </div>
+        <div class="rightcont" id="resultContainer">
+        </div>
         <div style="display:none" id="templates">
             <div class="resultcont" data-template="result">
                 <div class="resulttitle">
-                    <span name="id" style="width: 60px;">[1]</span>
-                    <span name="title">THIS IS A SUPER DUP TORRENT FUCK YEAH</span>
+                    <span style="width: 60px;">[<span name="id"></span>]</span>
+                    <span name="title"></span>
                 </div>
                 <div class="resultinfo">
                     <span style="width: 38px;">Size:</span>
-                    <span name="size" style="width: 25%; min-width:50px;">1.67 GiB</span>
+                    <span name="size" style="width: 15%; min-width:50px;"></span>
                     <span style="width: 50px;">Seeds:</span>
-                    <span name="seeds" style="width: 25%; min-width:50px;">3780</span>
+                    <span name="seeds" style="width: 15%; min-width:50px;"></span>
                 </div>
                 <div></div>
+            </div>
+            <div class="logcommand" data-template="logCommand" name="content"></div>
+            <div class="logresponse" data-template="logResponse" name="content"></div>
+            <div class="resultcont" data-template="torrent" name="result">
+                <div class="resulttitle">
+                    <span style="width: 60px;">[<span name="number"></span>]</span><span name="name"></span>
+                </div>
+                <div class="errorstring">
+                    <span name="errorString"></span>
+                </div>
+                <div class="progresscont">
+                    <div class="progressborder">
+                        <div name="progressBar"></div>
+                    </div>
+                    <div name="progressStatus"></div>
+                </div>
             </div>
         </div>
     </body>
