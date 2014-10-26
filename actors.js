@@ -76,6 +76,7 @@ function transmission(iCaller, iMethod, iArguments, iCallback) {
 function StatusReporter(iLogger, iResults) {
     this.logger = iLogger;
     this.results = iResults;
+    this.torrentActions = {};
 }
 
 StatusReporter.prototype = {
@@ -95,6 +96,7 @@ pushTorrent : function (iFields) {
     var comp = iFields.percentDone * 100;
     var theBar = theNode.querySelector("[name='progressBar']");
     theBar.setAttribute("style", "width: " + comp + "%");
+    theNode.addEventListener("click", this.displayMenu.bind(this, iFields.number));
 },
 getAttributes : function (iTorrent) {
     var theAttributes = {};
@@ -145,11 +147,21 @@ getActive : function () {
                  this.displayTorrents);
 },
 act : function (iArgs) {
-    if (iArgs.length == 0) {
+    if (!iArgs || iArgs.length == 0) {
         this.getActive();
     } else {
-
+        this.logger.pushResponse("I do not accept this!");
     }
+},
+displayMenu : function (iNumber, iEvt) {
+    var aMenu = new Menu();
+    for (var key in this.torrentActions) {
+        if (this.torrentActions.hasOwnProperty(key)) {
+            var theActor = this.torrentActions[key]; 
+            aMenu.addItem(theActor.actionName, theActor.act.bind(theActor, iNumber));
+        }
+    }
+    MenuHandler.prototype.getInstance().display(aMenu, iEvt);
 },
 }
 
@@ -213,6 +225,9 @@ callback : function (iReq, iEvt) {
 function TorrentActor(iLogger, iReporter, iAction) {
     this.logger = iLogger;
     this.reporter = iReporter;
+    if (iReporter) {
+        iReporter.torrentActions[iAction] = this;
+    }
     this.actionName = iAction;
 }
 
@@ -248,6 +263,7 @@ callback : function (iReq, iEvt) {
         if (iReq.status == 200) {
             try {
                 this.logger.pushResponse("Action successful.");
+                this.reporter.act();
             } catch(e) {
                 console.log(e);
                 this.logger.pushResponse("Error encountered.");
@@ -262,6 +278,7 @@ callback : function (iReq, iEvt) {
 function TorrentRemover(iLogger, iReporter) {
     this.logger = iLogger;
     this.reporter = iReporter;
+    iReporter.torrentActions[TorrentRemover.prototype.actionName] = this;
 }
 
 TorrentRemover.prototype = new TorrentActor();

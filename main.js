@@ -196,7 +196,17 @@ dispatchCommand : function(iCommand) {
 },
 addActor : function (iActor) {
     this.actors[iActor.actionName] = iActor;
+    return iActor;
 },
+getActor : function (iActorClass) {
+    if (typeof(iActorClass) == "string") {
+        return this.actors[iActorClass];
+    } else {
+        if (iActorClass.prototype.actionName) {
+            return this.actors[iActorClass.prototype.actionName];
+        }
+    }
+}
 }
 
 /*
@@ -248,6 +258,56 @@ clearDisplay : function() {
 },
 }
 
+function MenuHandler () {
+    this.displayed = false;
+    window.addEventListener("resize", this.hide.bind(this));
+    document.body.addEventListener("click", this.hide.bind(this));
+}
+
+MenuHandler.prototype = {
+clickator : function () {
+    console.log("test");
+},
+hide : function () {
+    if (this.currentMenu) {
+        document.body.removeChild(this.currentMenu);
+        this.currentMenu = null;
+    }
+},
+getInstance : function () {
+    if (!MenuHandler.prototype.instance) {
+        MenuHandler.prototype.instance = new MenuHandler ();
+    }
+    return MenuHandler.prototype.instance;
+},
+display : function (iMenu, iEvt) {
+    this.hide();
+    iEvt.stopPropagation();
+    this.currentMenu = iMenu.node;
+    var theX = iEvt.x || iEvt.clientX;
+    var theY = iEvt.y || iEvt.clientY;
+    document.body.appendChild(iMenu.node);
+    var theMaxX = window.innerWidth - iMenu.node.offsetWidth - 1;
+    var theMaxY = window.innerHeight - iMenu.node.offsetHeight - 1;
+    iMenu.node.style.left = Math.min(theX, theMaxX) + 'px';
+    iMenu.node.style.top = Math.min(theY, theMaxY) + 'px';
+},
+}
+
+function Menu () {
+    this.node = this.menuTemplate.getNode();
+}
+
+Menu.prototype = {
+menuTemplate : new Template("menu"),
+itemTemplate : new Template("menuItem"),
+addItem : function (iName, iOnclick) {
+    var theItem = this.node.appendChild(this.itemTemplate.getNode({item : iName}));
+    theItem.addEventListener("click", iOnclick);
+    theItem.addEventListener("click", MenuHandler.prototype.getInstance().hide.bind(MenuHandler.prototype.getInstance()));
+},
+}
+
 window.onload = function() {
     var aLogComTmpl = new Template("logCommand");
     var aLogResTmpl = new Template("logResponse");
@@ -257,10 +317,10 @@ window.onload = function() {
     var aLogger = new Logger(document.getElementById("historyCont"), aLogComTmpl, aLogResTmpl);
     var aHandler = new CommandHandler(document.getElementById("mainInput"), aLogger);
     aHandler.addActor(new Searcher(aLogger, aDisplay));
-    aHandler.addActor(new StatusReporter(aLogger, aDisplay));
-    aHandler.addActor(new Downloader(aLogger, aHandler.actors["search"]));
-    aHandler.actors["search"].downloader = aHandler.actors["dl"];
-    aHandler.addActor(new TorrentActor(aLogger, aHandler.actors["status"], "start"));
-    aHandler.addActor(new TorrentActor(aLogger, aHandler.actors["status"], "stop"));
-    aHandler.addActor(new TorrentRemover(aLogger, aHandler.actors["status"]));
+    var aReporter = aHandler.addActor(new StatusReporter(aLogger, aDisplay));
+    aHandler.addActor(new Downloader(aLogger, aHandler.getActor(Searcher)));
+    aHandler.getActor(Searcher).downloader = aHandler.getActor(Downloader);
+    aHandler.addActor(new TorrentActor(aLogger, aHandler.getActor(StatusReporter), "start"));
+    aHandler.addActor(new TorrentActor(aLogger, aHandler.getActor(StatusReporter), "stop"));
+    aHandler.addActor(new TorrentRemover(aLogger, aHandler.getActor(StatusReporter)));
 }
