@@ -2,10 +2,10 @@
 
 function ConfigHandler (iLogger) {
     this.logger = iLogger;
-    if (localStorage) {
-        this.user = localStorage.getItem("user");
-        this.url = localStorage.getItem("url");
-        this.password = localStorage.getItem("password");
+    if (window.localStorage) {
+        this.user = window.localStorage.getItem("user");
+        this.url = window.localStorage.getItem("url");
+        this.password = window.localStorage.getItem("password");
     } else {
         this.logger.pushResponse("Your browser does not seem to implement localStorage.")
     }
@@ -29,10 +29,10 @@ act : function (iArgs) {
         this.user = theArgs[0];
         this.url = theArgs[1];
         this.password = iArgs[1];
-        if (this.check() && localStorage) {
-            localStorage.setItem("user", this.user);
-            localStorage.setItem("password", this.password);
-            localStorage.setItem("url", this.url);
+        if (this.check() && window.localStorage) {
+            window.localStorage.setItem("user", this.user);
+            window.localStorage.setItem("password", this.password);
+            window.localStorage.setItem("url", this.url);
         }
     }
 },
@@ -289,9 +289,7 @@ callback : function (iReq, iEvt) {
 function TorrentActor(iLogger, iReporter, iAction) {
     this.logger = iLogger;
     this.reporter = iReporter;
-    if (iReporter) {
-        iReporter.torrentActions[iAction] = this;
-    }
+    iReporter.torrentActions[iAction] = this;
     this.actionName = iAction;
 }
 
@@ -345,7 +343,7 @@ function TorrentRemover(iLogger, iReporter) {
     iReporter.torrentActions[TorrentRemover.prototype.actionName] = this;
 }
 
-TorrentRemover.prototype = new TorrentActor();
+TorrentRemover.prototype = Object.create(TorrentActor.prototype);
 TorrentRemover.prototype.actionName = "remove";
 TorrentRemover.prototype.constructor = TorrentRemover;
 TorrentRemover.prototype.sendReq = function (iId) {
