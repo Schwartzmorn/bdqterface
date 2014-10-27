@@ -1,5 +1,72 @@
 "use strict";
 
+function ConfigHandler (iLogger) {
+    this.logger = iLogger;
+    if (localStorage) {
+        this.user = localStorage.getItem("user");
+        this.url = localStorage.getItem("url");
+        this.password = localStorage.getItem("password");
+    } else {
+        this.logger.pushResponse("Your browser does not seem to implement localStorage.")
+    }
+    this.check();
+}
+
+/*
+ * Handles the configuration of the targetted transmission client.
+ * Also provides a convenient interface.
+ */
+ConfigHandler.prototype = {
+actionName : "config",
+help : function () {
+    return "Usage: [user]@[transmissionrpc.url] [password]";
+},
+act : function (iArgs) {
+    if (!iArgs || iArgs.length != 2) {
+        this.logger.pushResponse("Incorrect input.")
+    } else {
+        var theArgs = iArgs[0].split('@');
+        this.user = theArgs[0];
+        this.url = theArgs[1];
+        this.password = iArgs[1];
+        if (this.check() && localStorage) {
+            localStorage.setItem("user", this.user);
+            localStorage.setItem("password", this.password);
+            localStorage.setItem("url", this.url);
+        }
+    }
+},
+getInstance : function (iLogger) {
+    if (!ConfigHandler.prototype.instance) {
+        ConfigHandler.prototype.instance = new ConfigHandler(iLogger);
+    }
+    return ConfigHandler.prototype.instance;
+},
+check : function () {
+    if (!this.url || !this.password || !this.user) {
+        this.logger.pushResponse("Your transmission client is not correctly configured.")
+        this.logger.pushResponse("Type 'help " + this.actionName + "' for more info.")
+        return false;
+    }
+    return true;
+},
+transmit : function (iCaller, iMethod, iArguments, iCallback) {
+    if (!this.check()) {
+        return;
+    }
+    var aReq = new XMLHttpRequest();
+    aReq.open('POST', "https://pbparser.appspot.com/proxy", true);
+    aReq.onreadystatechange = iCallback.bind(iCaller, aReq);
+    var aFormData = new FormData();
+    aFormData.append("method", iMethod);
+    aFormData.append("args", JSON.stringify(iArguments));
+    aFormData.append("user", this.user);
+    aFormData.append("password", this.password);
+    aFormData.append("url", this.url);
+    aReq.send(aFormData);
+},
+}
+
 /*
  * Searcher: responsible for getting and displaying torrent searches
  */
@@ -61,13 +128,7 @@ act : function (iQuery) {
  * Helper function to deal with the transmission proxy
  */
 function transmission(iCaller, iMethod, iArguments, iCallback) {
-    var aReq = new XMLHttpRequest();
-    aReq.open('POST', "https://pbparser.appspot.com/proxy", true);
-    aReq.onreadystatechange = iCallback.bind(iCaller, aReq);
-    var aFormData = new FormData();
-    aFormData.append("method", iMethod);
-    aFormData.append("args", JSON.stringify(iArguments));
-    aReq.send(aFormData);
+    ConfigHandler.prototype.getInstance().transmit(iCaller, iMethod, iArguments, iCallback);
 }
 
 /*
@@ -147,6 +208,9 @@ getActive : function () {
                  this.displayTorrents);
 },
 act : function (iArgs) {
+    if (!ConfigHandler.prototype.getInstance().check()) {
+        return;
+    }
     if (!iArgs || iArgs.length == 0) {
         this.getActive();
     } else {

@@ -323,4 +323,5 @@ window.onload = function() {
     aHandler.addActor(new TorrentActor(aLogger, aHandler.getActor(StatusReporter), "start"));
     aHandler.addActor(new TorrentActor(aLogger, aHandler.getActor(StatusReporter), "stop"));
     aHandler.addActor(new TorrentRemover(aLogger, aHandler.getActor(StatusReporter)));
+    aHandler.addActor(ConfigHandler.prototype.getInstance(aLogger));
 }
