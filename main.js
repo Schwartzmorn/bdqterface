@@ -71,8 +71,8 @@ getNode : function(iValues) {
  */
 function CommandHandler(iInput, iLogger) {
     this.logger = iLogger;
-    if (localStorage) {
-        var a = localStorage.getItem("history");
+    if (window.localStorage) {
+        var a = window.localStorage.getItem("history");
         try {
             if (a) {
                 this.history = JSON.parse(a);
@@ -284,8 +284,8 @@ display : function (iMenu, iEvt) {
     this.hide();
     iEvt.stopPropagation();
     this.currentMenu = iMenu.node;
-    var theX = iEvt.x || iEvt.clientX;
-    var theY = iEvt.y || iEvt.clientY;
+    var theX = iEvt.clientX;
+    var theY = iEvt.clientY;
     document.body.appendChild(iMenu.node);
     var theMaxX = window.innerWidth - iMenu.node.offsetWidth - 1;
     var theMaxY = window.innerHeight - iMenu.node.offsetHeight - 1;
