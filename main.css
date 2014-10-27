@@ -1,0 +1,123 @@
+html {
+    height: 100%;
+}
+
+body {
+    font-family: "arial";
+    font-size: 20px;
+    margin: 0px;
+    height: 100%;
+    position: relative;
+}
+
+div,span,input {
+    box-sizing: border-box;
+}
+
+.leftcont {
+    display: inline-block;
+    float: left;
+    width: 40%;
+    height: 100%;
+    position: relative;
+}
+
+.rightcont {
+    display: inline-block;
+    float:left;
+    width: 60%;
+    height: 100%;
+    border-left: 1px solid gray;
+    overflow: auto;
+}
+
+.maininput {
+    width: 100%;
+    font-size: 20px;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    border-top: 1px solid gray;
+    border-bottom: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    margin: 0px;
+    padding: 3px;
+}
+
+.resultcont {
+    background-color: #F0F0F0;
+    border: 1px gray solid;
+    padding: 3px;
+}
+
+.resultcont:hover {
+    background-color: white;
+    cursor: pointer;
+}
+
+.resultcont div {
+    clear: both;
+}
+
+.resulttitle>span {
+    float: left;
+}
+
+.resultinfo>span {
+    float: left;
+}
+
+.resultinfo {
+    font-size: 14px;
+}
+
+.history {
+    text-align: bottom;
+    height: calc(100% - 31px);
+    padding: 3px;
+    overflow: hidden;
+}
+
+.logresponse {
+    font-weight: bold;
+}
+
+.progresscont {
+    position: relative;
+    width: 100%;
+    padding: 5px 15px;
+}
+
+.progressborder {
+    width: 100%;
+    border: 1px solid gray;
+    background-color: white;
+}
+
+[name="progressBar"] {
+    height: 5px;
+    background-color: green;
+}
+
+.errorstring {
+    font-size: 10px;
+    color: red;
+}
+
+[data-status="inError"] {
+    background-color: #F5A9A9;
+}
+
+[data-status="inMildError"] {
+    background-color: #F5C9C9;
+}
+
+[data-status="inDownload"] {
+    background-color: #9FF781;
+}
+
+.menu {
+    position: absolute;
+    border: 1px gray solid;
+}
